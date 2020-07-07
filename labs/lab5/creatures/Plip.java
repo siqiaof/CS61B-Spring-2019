@@ -1,14 +1,15 @@
 package creatures;
 
-import huglife.Creature;
-import huglife.Direction;
-import huglife.Action;
-import huglife.Occupant;
+import huglife.*;
 
 import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.function.DoubleToIntFunction;
+
+import static huglife.HugLifeUtils.random;
+import static huglife.HugLifeUtils.randomEntry;
 
 /**
  * An implementation of a motile pacifist photosynthesizer.
@@ -57,7 +58,9 @@ public class Plip extends Creature {
      * that you get this exactly correct.
      */
     public Color color() {
-        g = 63;
+        r = 99;
+        g = (int) (63 + 96 *  energy);
+        b = 76;
         return color(r, g, b);
     }
 
@@ -74,7 +77,8 @@ public class Plip extends Creature {
      * private static final variable. This is not required for this lab.
      */
     public void move() {
-        // TODO
+        energy -= 0.15;
+        if (energy < 0) {energy = 0;}
     }
 
 
@@ -82,7 +86,8 @@ public class Plip extends Creature {
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
     public void stay() {
-        // TODO
+        energy += 0.2;
+        if (energy > 2) {energy = 2;}
     }
 
     /**
@@ -91,7 +96,9 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        energy = energy * 0.5;
+        double babyEnergy = energy * 0.5;
+        return new Plip(babyEnergy);
     }
 
     /**
@@ -111,20 +118,24 @@ public class Plip extends Creature {
         // Rule 1
         Deque<Direction> emptyNeighbors = new ArrayDeque<>();
         boolean anyClorus = false;
-        // TODO
-        // (Google: Enhanced for-loop over keys of NEIGHBORS?)
-        // for () {...}
-
-        if (false) { // FIXME
-            // TODO
+        for (Direction d: neighbors.keySet()) {
+            if (neighbors.get(d).name().equals("empty")) {
+                emptyNeighbors.addFirst(d);
+            }
+            else if (neighbors.get(d).name().equals("Clorus")) {
+                anyClorus = true;
+            }
         }
 
-        // Rule 2
-        // HINT: randomEntry(emptyNeighbors)
-
-        // Rule 3
-
-        // Rule 4
+        if (emptyNeighbors.size() == 0) {
+            return new Action(Action.ActionType.STAY);
+        } else if (energy >= 1.0) {
+            return new Action(Action.ActionType.REPLICATE, randomEntry(emptyNeighbors));
+        } else if (anyClorus) {
+            if (random() < 0.5) {
+                return new Action(Action.ActionType.MOVE, randomEntry(emptyNeighbors));
+            }
+        }
         return new Action(Action.ActionType.STAY);
     }
 }
