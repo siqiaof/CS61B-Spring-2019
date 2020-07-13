@@ -66,6 +66,16 @@ public class BST<Key extends Comparable<Key>> {
         return getRandomNode(root).key;
     }
 
+    /** Returns the internal path length of the BST. */
+    public int getIPL() {
+        return getIPL(root);
+    }
+
+    /** Returns the average depth of the BST. */
+    public double getAverageDepth() {
+        return getIPL() / (double) size();
+    }
+
 
     /** Private methods and variables follow. There's no need to read
      *  any of this.
@@ -205,6 +215,19 @@ public class BST<Key extends Comparable<Key>> {
         return x;
     }
 
+    public static void main(String[] args) {
+        BST<Integer> b = new BST<>();
+        b.add(4);
+        b.add(2);
+        b.add(6);
+        b.add(1);
+        b.add(3);
+        b.add(5);
+        b.add(7);
+        b.add(8);
+        System.out.println(b.getAverageDepth() + "  " + b.getIPL());
+    }
+
     /**
      * Removes the largest key and associated value from the BST.
      *
@@ -245,5 +268,16 @@ public class BST<Key extends Comparable<Key>> {
      */
     private boolean isEmpty() {
         return size() == 0;
+    }
+
+    /** Returns the internal path length of a node. */
+    private int getIPL(Node node) {
+        if (node == null) {
+            return 0;
+        } else if (size(node) == 1) {
+            return 0;
+        } else {
+            return size(node.left) + size(node.right) + getIPL(node.left) + getIPL(node.right);
+        }
     }
 }
