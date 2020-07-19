@@ -11,10 +11,10 @@ import java.util.Random;
  */
 public class Experiments {
     public static int tree_size = 5000;
-    public static int repeating_times = 50000;
+    public static int item_range = 2147483647;
+    public static int repeating_times = 1000000;
 
     public static void experiment1() {
-        Random r = new Random();
         List<Double> y1Values = new ArrayList<>();
         List<Double> y2Values = new ArrayList<>();
         List<Integer> xValues = new ArrayList<>();
@@ -22,7 +22,7 @@ public class Experiments {
         BST<Integer> b = new BST<>();
         for (int i = 0; i < tree_size; i++) {
             xValues.add(i+1);
-            b.add(r.nextInt());
+            b.add(RandomGenerator.getRandomInt(item_range));
             y1Values.add(b.getAverageDepth());
             y2Values.add(ExperimentHelper.optimalAverageDepth(i+1));
         }
@@ -37,12 +37,11 @@ public class Experiments {
     }
 
     public static void experiment2() {
-        Random r = new Random();
         List<Integer> xValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
         BST<Integer> b = new BST<>();
         for (int i = 0; i < tree_size; i++) {
-            b.add(r.nextInt());
+            b.add(RandomGenerator.getRandomInt(item_range));
         }
         xValues.add(0);
         yValues.add(b.getAverageDepth());
@@ -57,12 +56,11 @@ public class Experiments {
     }
 
     public static void experiment3() {
-        Random r = new Random();
         List<Integer> xValues = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
         BST<Integer> b = new BST<>();
         for (int i = 0; i < tree_size; i++) {
-            b.add(r.nextInt());
+            b.add(RandomGenerator.getRandomInt(item_range));
         }
         xValues.add(0);
         yValues.add(b.getAverageDepth());
@@ -78,7 +76,7 @@ public class Experiments {
 
     public static void main(String[] args) {
         //experiment1();
-        //experiment2();
+        experiment2();
         //experiment3();
     }
 }

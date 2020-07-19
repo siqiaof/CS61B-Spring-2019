@@ -16,6 +16,8 @@ class RollingString{
      * DO NOT CHANGE THIS.
      */
     static final int PRIMEBASE = 6113;
+    char[] rollingString;
+    int hash;
 
     /**
      * Initializes a RollingString with a current value of String s.
@@ -23,7 +25,13 @@ class RollingString{
      */
     public RollingString(String s, int length) {
         assert(s.length() == length);
-        /* FIX ME */
+        rollingString = s.toCharArray();
+        hash = 0;
+        int i = 0;
+        for (char c : rollingString) {
+            hash += (int) c * Math.pow(UNIQUECHARS, i);
+            i += 1;
+        }
     }
 
     /**
@@ -32,7 +40,11 @@ class RollingString{
      * Should be a constant-time operation.
      */
     public void addChar(char c) {
-        /* FIX ME */
+        hash -= rollingString[0];
+        char[] temp = rollingString;
+        System.arraycopy(temp,1, rollingString, 0, temp.length-1);
+        rollingString[temp.length-1] = c;
+        hash = (int) (hash/UNIQUECHARS + (int) c * Math.pow(UNIQUECHARS, length() - 1));
     }
 
 
@@ -43,8 +55,8 @@ class RollingString{
      */
     public String toString() {
         StringBuilder strb = new StringBuilder();
-        /* FIX ME */
-        return "";
+        strb.append(rollingString);
+        return strb.toString();
     }
 
     /**
@@ -52,8 +64,7 @@ class RollingString{
      * Should be a constant-time operation.
      */
     public int length() {
-        /* FIX ME */
-        return -1;
+        return rollingString.length;
     }
 
 
@@ -64,8 +75,15 @@ class RollingString{
      */
     @Override
     public boolean equals(Object o) {
-        /* FIX ME */
-        return false;
+        if (o == this) {
+            return true;
+        } else if (o == null) {
+            return false;
+        } else if (o.getClass() != this.getClass()) {
+            return false;
+        }
+        RollingString other = (RollingString) o;
+        return this.toString().equals(other.toString());
     }
 
     /**
@@ -74,7 +92,6 @@ class RollingString{
      */
     @Override
     public int hashCode() {
-        /* FIX ME */
-        return -1;
+        return hash % PRIMEBASE;
     }
 }

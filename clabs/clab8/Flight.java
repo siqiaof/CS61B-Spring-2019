@@ -24,4 +24,6 @@ public class Flight {
     public int passengers() {
         return passengers;
     }
+
+
 }

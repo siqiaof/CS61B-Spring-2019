@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 /**
  * Solver for the Flight problem (#9) from CS 61B Spring 2018 Midterm 2.
@@ -7,14 +8,25 @@ import java.util.ArrayList;
  * considered to be in the air at the same time.
  */
 public class FlightSolver {
-
+    public ArrayList<Flight> flights;
+    private PriorityQueue<Integer> maxPassengers = new PriorityQueue<>();
     public FlightSolver(ArrayList<Flight> flights) {
-        /* FIX ME */
+        this.flights = flights;
     }
 
     public int solve() {
-        /* FIX ME */
-        return -1;
+        for (int i = 0; i < flights.size(); i += 1) {
+            int passengers = flights.get(i).passengers;
+            for (int j = i + 1; j < flights.size(); j += 1) {
+                if (flights.get(i).endTime() > flights.get(j).startTime()) {
+                    passengers += flights.get(j).passengers;
+                } else {
+                    break;
+                }
+            }
+            maxPassengers.add(-passengers);
+        }
+        return -maxPassengers.peek();
     }
 
 }

@@ -49,15 +49,13 @@ public class ExperimentHelper {
     }
 
     public static void DTSAndInsert(BST<Integer> b) {
-        Random r = new Random();
         b.deleteTakingSuccessor(b.getRandomKey());
-        b.add(r.nextInt());
+        b.add(RandomGenerator.getRandomInt(Experiments.item_range));
     }
 
     public static void DTRAndInsert(BST<Integer> b) {
-        Random r = new Random();
         b.deleteTakingRandom(b.getRandomKey());
-        b.add(r.nextInt());
+        b.add(RandomGenerator.getRandomInt(Experiments.item_range));
     }
 
     public static void main(String[] args) {
