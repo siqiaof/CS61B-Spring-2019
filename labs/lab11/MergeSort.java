@@ -42,8 +42,13 @@ public class MergeSort {
      */
     private static <Item extends Comparable> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
-        // Your code here!
-        return null;
+        Queue<Queue<Item>> SingleItemQueues = new Queue<>();
+        for (Item item : items) {
+            Queue<Item> temp = new Queue<>();
+            temp.enqueue(item);
+            SingleItemQueues.enqueue(temp);
+        }
+        return SingleItemQueues;
     }
 
     /**
@@ -61,8 +66,25 @@ public class MergeSort {
      */
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
-        // Your code here!
-        return null;
+        Queue<Item> merged = new Queue<>();
+        while (true) {
+            if (q1.isEmpty()) {
+                for (Item i : q2) {
+                    merged.enqueue(i);
+                }
+                break;
+            } else if (q2.isEmpty()) {
+                for (Item i : q1) {
+                    merged.enqueue(i);
+                }
+                break;
+            } else if (q1.peek().compareTo(q2.peek()) < 0) {
+                merged.enqueue(q1.dequeue());
+            } else {
+                merged.enqueue(q2.dequeue());
+            }
+        }
+        return merged;
     }
 
     /**
@@ -77,7 +99,17 @@ public class MergeSort {
      */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
-        // Your code here!
-        return items;
+        Queue<Queue<Item>> unmerged = makeSingleItemQueues(items);
+        while (unmerged.size() > 1) {
+            Queue<Queue<Item>> temp = new Queue<>();
+            while (unmerged.size() > 1) {
+                temp.enqueue(mergeSortedQueues(unmerged.dequeue(), unmerged.dequeue()));
+            }
+            if (unmerged.size() != 0) {
+                temp.enqueue(unmerged.dequeue());
+            }
+            unmerged = temp;
+        }
+        return unmerged.peek();
     }
 }

@@ -23,8 +23,38 @@ public class SeparableEnemySolver {
      * Returns true if input is separable, false otherwise.
      */
     public boolean isSeparable() {
-        // TODO: Fix me
-        return false;
+        Queue<String> fringe = new ArrayDeque<>();
+        HashMap<String, Integer> StringToInt = new HashMap<>();
+        int i = 0;
+        for (String s : g.labels()) {
+            StringToInt.put(s, i);
+            i++;
+        }
+        HashSet<String> mark = new HashSet<>();
+        int[] distTo = new int[i];
+
+        for (String s : g.labels()) {
+            if (!mark.contains(s)) {
+                fringe.add(s);
+                mark.add(s);
+                while (!fringe.isEmpty()) {
+                    String v = fringe.remove();
+                    for (String n : g.neighbors(v)) {
+                        int idOfN = StringToInt.get(n);
+                        if (!mark.contains(n)) {
+                            mark.add(n);
+                            fringe.add(n);
+                            distTo[idOfN] = distTo[StringToInt.get(v)] + 1;
+                        } else {
+                            if (distTo[StringToInt.get(v)] == distTo[idOfN]) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 
