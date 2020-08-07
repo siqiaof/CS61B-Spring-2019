@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static bearmaps.proj2c.utils.Constants.SEMANTIC_STREET_GRAPH;
-import static bearmaps.proj2c.utils.Constants.ROUTE_LIST;
+import static bearmaps.proj2c.utils.Constants.*;
 
 /**
  * Handles requests from the web browser for map images. These images
@@ -49,6 +48,10 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     @Override
     protected Map<String, Double> parseRequestParams(Request request) {
         return getRequestParams(request, REQUIRED_RASTER_REQUEST_PARAMS);
+    }
+
+    private double LonDPP(Map<String, Double> requestParams) {
+        return (requestParams.get("lrlon") - requestParams.get("ullon")) / requestParams.get("w");
     }
 
     /**
@@ -84,11 +87,60 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        double requestLonDPP = LonDPP(requestParams);
+        if (requestParams.get("ullon") >= requestParams.get("lrlon") ||
+                requestParams.get("ullat") <= requestParams.get("lrlat")) {
+            results.put("query_success", false);
+        }   /* query box that doesn’t make any sense */
+        else if (requestParams.get("lrlon") <= ROOT_ULLON || requestParams.get("ullon") >= ROOT_LRLON ||
+                requestParams.get("ullat") <= ROOT_LRLAT || requestParams.get("lrlat") >= ROOT_ULLAT) {
+            results.put("query_success", false);
+        }   /* no coverage */
+        else {
+            results.put("query_success", true);
+            double tileLonDPP = (ROOT_LRLON - ROOT_ULLON)/TILE_SIZE;
+            int depth = 0; /* depth */
+            while (tileLonDPP > requestLonDPP && depth < 7) {
+                depth += 1;
+                tileLonDPP /= 2;
+            }
+            int x_start, y_start, x_end, y_end;
+            double gridSizeX = (ROOT_LRLON - ROOT_ULLON) / Math.pow(2, depth);
+            double gridSizeY = (ROOT_ULLAT - ROOT_LRLAT) / Math.pow(2, depth);
+            x_start = (int) ((requestParams.get("ullon") - ROOT_ULLON) / gridSizeX);
+            x_end = (int) ((requestParams.get("lrlon") - ROOT_ULLON) / gridSizeX);
+            y_start = (int) ((ROOT_ULLAT - requestParams.get("ullat")) / gridSizeY);
+            y_end = (int) ((ROOT_ULLAT - requestParams.get("lrlat")) / gridSizeY);
+
+            if (x_start < 0) {
+                x_start = 0;
+            }
+            if (y_start < 0) {
+                y_start = 0;
+            }
+            if (x_end > Math.pow(2, depth) - 1) {
+                x_end = (int) Math.pow(2, depth) - 1;
+            }
+            if (y_end > Math.pow(2, depth) - 1) {
+                y_end = (int) Math.pow(2, depth) - 1;
+            }
+
+            String[][] render_grid = new String[y_end - y_start + 1][x_end - x_start + 1];
+            for (int i = 0; i < y_end - y_start + 1; i += 1) {
+                String[] render_row = new String[x_end - x_start + 1];
+                for (int j = 0; j < x_end - x_start + 1; j += 1) {
+                    render_row[j] = "d" + depth + "_x" + (j + x_start) + "_y" + (i + y_start) + ".png";
+                }
+                render_grid[i] = render_row;
+            }
+            results.put("render_grid", render_grid);
+            results.put("raster_ul_lon", ROOT_ULLON + x_start * gridSizeX);
+            results.put("raster_ul_lat", ROOT_ULLAT - y_start * gridSizeY);
+            results.put("raster_lr_lon", ROOT_ULLON + (x_end + 1) * gridSizeX);
+            results.put("raster_lr_lat", ROOT_ULLAT - (y_end + 1) * gridSizeY);
+            results.put("depth", depth);
+        }
         return results;
     }
 
